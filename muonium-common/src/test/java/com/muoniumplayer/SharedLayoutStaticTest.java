@@ -162,6 +162,7 @@ class SharedLayoutStaticTest {
             "com/muoniumplayer/MultiLoaderStaticTest.java",
             "com/muoniumplayer/Port1211StaticTest.java",
             "com/muoniumplayer/Port12110StaticTest.java",
+            "com/muoniumplayer/Port1218StaticTest.java",
             "com/muoniumplayer/render/skija/Port2612StaticTest.java",
             "com/muoniumplayer/core/rendering/animation/AnimationSpeedStaticTest.java",
             "com/muoniumplayer/core/settings/PlayerFadeSpeedProbeTest.java",
@@ -245,7 +246,12 @@ class SharedLayoutStaticTest {
     @Test
     @DisplayName("两侧 Kotlin 编译、共享源码和 smoke 验收接线完整")
     void bothLoadersWireKotlinSupport() throws IOException {
-        for (Path loader : Arrays.asList(ProjectPaths.fabric(), ProjectPaths.loaderDir())) {
+        // 单加载器树（如 1.21.8 仅 Fabric）只验在场的加载器；第二加载器的断言
+        // 由 secondLoaderDir 缺席即整体不适用，不算通过双加载器验收。
+        List<Path> loaders = new ArrayList<Path>();
+        loaders.add(ProjectPaths.fabric());
+        ProjectPaths.secondLoaderDir().ifPresent(loaders::add);
+        for (Path loader : loaders) {
             String build = Files.readString(loader.resolve("build.gradle"), StandardCharsets.UTF_8);
             assertTrue(build.contains("id 'org.jetbrains.kotlin.jvm'"), loader + " 未启用 Kotlin 编译");
             assertTrue(build.contains("id 'org.jetbrains.kotlin.plugin.lombok'"),
@@ -346,9 +352,10 @@ class SharedLayoutStaticTest {
     @Test
     @DisplayName("两个加载器都把共享根挂进了 sourceSets")
     void bothLoadersWireSharedRoots() throws IOException {
+        // 单加载器树（1.21.8 仅 Fabric）只验在场的加载器；第二加载器缺席即不适用。
         List<String> loaders = new ArrayList<String>();
         loaders.add("fabric");
-        loaders.add(ProjectPaths.loaderDir().getFileName().toString());
+        ProjectPaths.secondLoaderDir().ifPresent(p -> loaders.add(p.getFileName().toString()));
         for (String loader : loaders) {
             String build = Files.readString(ProjectPaths.versionRoot().resolve(loader)
                     .resolve("build.gradle"), StandardCharsets.UTF_8);

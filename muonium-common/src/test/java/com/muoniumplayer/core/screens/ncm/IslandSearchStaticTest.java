@@ -204,7 +204,7 @@ class IslandSearchStaticTest {
 
     /** 各版本树的名字。新树进来要同时补这里与 SHARE-MANIFEST。 */
     private static final String[] TREES = {
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"
     };
 
     @Test
@@ -252,7 +252,7 @@ class IslandSearchStaticTest {
         int en = 0;
         int zh = 0;
         Path repo = ProjectPaths.repoRoot();
-        for (String tree : new String[]{"1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"}) {
+        for (String tree : new String[]{"1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"}) {
             for (String lang : new String[]{"en_us.json", "zh_cn.json"}) {
                 Path file = repo.resolve(Paths.get(tree, "src", "main", "resources",
                         "assets", "muonium", "lang", lang));

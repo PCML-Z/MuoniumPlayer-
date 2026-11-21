@@ -38,7 +38,7 @@ class KeybindLangStaticTest {
 
     /** 各版本树的名字。新树进来要同时补这里与 SHARE-MANIFEST。 */
     private static final String[] TREES = {
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"
     };
 
     /** {@code key("key.muonium.xxx", ...)} —— createKeyMappings 的注册口。 */

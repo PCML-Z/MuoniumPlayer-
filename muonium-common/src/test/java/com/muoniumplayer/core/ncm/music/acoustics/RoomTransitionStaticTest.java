@@ -43,9 +43,9 @@ class RoomTransitionStaticTest {
                 "仍是 busy-skip:移动时采样周期会翻倍");
     }
 
-    /** 七棵版本树 —— 任何「树内独占文件」的功能都必须在这七处齐全。 */
+    /** 八棵版本树 —— 任何「树内独占文件」的功能都必须在这七处齐全。 */
     private static final String[] TREES = {
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3",
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3",
     };
 
     /** 读某棵树的 ListenerProbe 源码。 */
@@ -58,7 +58,7 @@ class RoomTransitionStaticTest {
     }
 
     @Test
-    @DisplayName("采样原点由树侧提供:接口有 default,七树 ListenerProbe 都覆盖")
+    @DisplayName("采样原点由树侧提供:接口有 default,八树 ListenerProbe 都覆盖")
     void originMetersProvidedByEveryTree() throws IOException {
         final String runtime = shared("com/muoniumplayer/core/ncm/music/acoustics/AcousticsRuntime.java");
         assertTrue(runtime.contains("default double[] originMeters()"),
@@ -74,7 +74,7 @@ class RoomTransitionStaticTest {
     }
 
     @Test
-    @DisplayName("遮挡边缘绕射:七树都实现新契约并真的调用搜索")
+    @DisplayName("遮挡边缘绕射:八树都实现新契约并真的调用搜索")
     void diffractionImplementedByEveryTree() throws IOException {
         for (String tree : TREES) {
             final String src = probe(tree);

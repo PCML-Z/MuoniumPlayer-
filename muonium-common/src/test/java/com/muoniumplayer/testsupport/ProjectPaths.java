@@ -263,6 +263,22 @@ public final class ProjectPaths {
         throw new IllegalStateException("版本工程根下既没有 forge 也没有 neoforge：" + versionRoot());
     }
 
+    /**
+     * 单加载器树（如 1.21.8 仅 Fabric）没有第二加载器时返回空。
+     * 双加载器树的行为与 {@link #loaderDir()} 一致；单加载器树的测试用
+     * {@code assumeTrue(secondLoaderDir().isPresent())} 跳过第二加载器专属断言，
+     * 不能反过来假装断言过。
+     */
+    public static java.util.Optional<Path> secondLoaderDir() {
+        for (String name : new String[]{"forge", "neoforge"}) {
+            Path candidate = versionRoot().resolve(name);
+            if (Files.isDirectory(candidate)) {
+                return java.util.Optional.of(candidate);
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
     /** {@link #loaderDir()} 的别名，留给写着 forge 的老断言。 */
     public static Path forge() {
         return loaderDir();

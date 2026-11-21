@@ -253,11 +253,14 @@ class AnnouncementStaticTest {
         assertTrue(fabric.contains("Screens.get"),
                 "加组件走 fabric-screen-api 的活列表，不自己碰原版受保护方法");
 
-        Path loader = loaderShell();
-        String loaderSide = stripComments(read(loader));
-        assertTrue(loaderSide.contains("onScreenInit"), "加载器侧外壳必须挂 ScreenEvent.Init.Post 监听");
-        assertTrue(loaderSide.contains("TitleMenuAnnouncementButton.appliesTo("),
-                "加载器侧也要先判「是不是主菜单」再挂");
+        // 第二加载器侧（单加载器树如 1.21.8 仅 Fabric 时不存在，跳过该侧断言）
+        if (ProjectPaths.secondLoaderDir().isPresent()) {
+            Path loader = loaderShell();
+            String loaderSide = stripComments(read(loader));
+            assertTrue(loaderSide.contains("onScreenInit"), "加载器侧外壳必须挂 ScreenEvent.Init.Post 监听");
+            assertTrue(loaderSide.contains("TitleMenuAnnouncementButton.appliesTo("),
+                    "加载器侧也要先判「是不是主菜单」再挂");
+        }
 
         String mixins = read(ROOT.resolve(Paths.get("fabric", "src", "main", "resources",
                 "muonium.mixins.json")));

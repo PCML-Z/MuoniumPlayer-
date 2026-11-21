@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TouchScrollWiringStaticTest {
 
     private static final List<String> CHAT_ISLAND_PORTS = List.of(
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3");
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3");
 
     private static String read(String relative) throws Exception {
         Path path = ProjectPaths.sharedJava().resolve(
@@ -34,7 +34,8 @@ class TouchScrollWiringStaticTest {
         for (String port : CHAT_ISLAND_PORTS) {
             Path tree = ProjectPaths.repoRoot().resolve(port);
             String source = readVersionSource(tree, "mixin/ChatIslandMouseMixin.java");
-            boolean rawButtons = port.equals("1.20.1 recode") || port.equals("1.21.1");
+            boolean rawButtons = port.equals("1.20.1 recode") || port.equals("1.21.1")
+                    || port.equals("1.21.8"); // 1.21.8 混合代际：输入/窗口还是旧形，MouseHandler 是 onPress(JIII)V
             String descriptor = rawButtons ? "onPress(JIII)V"
                     : "onButton(JLnet/minecraft/client/input/MouseButtonInfo;I)V";
             assertTrue(source.contains("@Mixin(MouseHandler.class)") && source.contains(descriptor),
@@ -60,6 +61,10 @@ class TouchScrollWiringStaticTest {
             }
             String otherLoader = port.equals("1.20.1 recode") ? "forge" : "neoforge";
             for (String loader : List.of("fabric", otherLoader)) {
+                // 单加载器树（1.21.8 仅 Fabric）没有第二外壳，缺席侧不适用。
+                if (!Files.isDirectory(tree.resolve(loader))) {
+                    continue;
+                }
                 String mixins = Files.readString(tree.resolve(loader).resolve(
                         "src/main/resources/muonium.mixins.json"), StandardCharsets.UTF_8);
                 assertEquals(2, mixins.split("\"ChatIslandMouseMixin\"", -1).length,

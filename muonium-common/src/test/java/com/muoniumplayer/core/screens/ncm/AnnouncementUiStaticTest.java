@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** 公告中心离线结构契约；不初始化界面、HTTP、原生图片或游戏宿主。 */
 class AnnouncementUiStaticTest {
     private static final String[] TREES = {
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"};
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3"};
     private static final String SCREENS = "com/muoniumplayer/core/screens/";
     private static final Path NCM = ProjectPaths.sharedJava().resolve(SCREENS + "ncm");
 

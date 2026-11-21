@@ -333,8 +333,11 @@ class SkijaNativeCatalogStaticTest {
     @Test
     @DisplayName("钉住的 Skija 版本在三处必须一致")
     void pinnedVersionMatchesBuildScripts() throws IOException {
-        for (String file : List.of(Paths.get("fabric", "build.gradle").toString(),
-                Paths.get(ProjectPaths.loaderDir().getFileName().toString(), "build.gradle").toString())) {
+        List<String> buildFiles = new java.util.ArrayList<String>();
+        buildFiles.add(Paths.get("fabric", "build.gradle").toString());
+        ProjectPaths.secondLoaderDir().ifPresent(dir ->
+                buildFiles.add(Paths.get(dir.getFileName().toString(), "build.gradle").toString()));
+        for (String file : buildFiles) {
             String gradle = read(ProjectPaths.versionRoot().resolve(file));
             assertTrue(gradle.contains("skija-shared:" + PINNED),
                     file + " 里的 skija-shared 坐标必须与 SkijaNatives.PINNED_SKIJA_VERSION 一致（"
@@ -418,15 +421,18 @@ class SkijaNativeCatalogStaticTest {
         assertTrue(fabricEntry.contains(", false)"), "HUD 那条路要挂上提示");
         assertTrue(fabricEntry.contains(", true)"), "界面里也要挂上，且说满");
 
-        String loaderEntry = read(ProjectPaths.loaderDir()
-                .resolve(Paths.get("src", "main", "java", "com", "muoniumplayer", "loader",
-                        ProjectPaths.loaderDir().getFileName().toString(),
-                        loaderShellName() + ".java")));
-        assertEquals(2, countCalls(loaderEntry),
-                ProjectPaths.loaderDir().getFileName() + " 外壳的 HUD 与 Screen 各要一次 onRenderLayerNotice");
-        assertTrue(loaderEntry.contains("event.getGuiGraphics(), false)")
-                        && loaderEntry.contains("event.getGuiGraphics(), true)"),
-                "forge/neoforge 两个挂点都从事件上拿原版绘制上下文");
+        // 第二加载器外壳：HUD 与 Screen 各挂一次。单加载器树（如 1.21.8 仅 Fabric）没有第二外壳。
+        if (ProjectPaths.secondLoaderDir().isPresent()) {
+            String loaderEntry = read(ProjectPaths.loaderDir()
+                    .resolve(Paths.get("src", "main", "java", "com", "muoniumplayer", "loader",
+                            ProjectPaths.loaderDir().getFileName().toString(),
+                            loaderShellName() + ".java")));
+            assertEquals(2, countCalls(loaderEntry),
+                    ProjectPaths.loaderDir().getFileName() + " 外壳的 HUD 与 Screen 各要一次 onRenderLayerNotice");
+            assertTrue(loaderEntry.contains("event.getGuiGraphics(), false)")
+                            && loaderEntry.contains("event.getGuiGraphics(), true)"),
+                    "forge/neoforge 两个挂点都从事件上拿原版绘制上下文");
+        }
     }
 
     @Test

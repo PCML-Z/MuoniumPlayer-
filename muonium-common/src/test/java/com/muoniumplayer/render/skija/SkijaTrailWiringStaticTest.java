@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SkijaTrailWiringStaticTest {
-    private static final List<String> PORTS = List.of("1.20.1 recode", "1.21.1", "1.21.10",
+    private static final List<String> PORTS = List.of("1.20.1 recode", "1.21.1", "1.21.8", "1.21.10",
             "1.21.11 recode", "26.1.2", "26.2", "26.3");
 
     @Test

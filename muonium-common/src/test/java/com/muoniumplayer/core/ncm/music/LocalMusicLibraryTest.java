@@ -69,7 +69,9 @@ class LocalMusicLibraryTest {
         assertTrue(music.isLocal());
 
         // fileOf 反查的就是 sourceId 里存的那个路径；文件在就在，不在就 null。
-        assertEquals(file.getAbsoluteFile(), music.localFile());
+        // 身份是规范化小写路径（fileIdentity），比较走两端的 canonical 形——macOS 的
+        // /var→/private/var 与盘符大小写差异只在绝对路径字符串上有，语义是同一文件。
+        assertEquals(file.getCanonicalFile(), music.localFile().getCanonicalFile());
         File gone = new File(temp.toFile(), "deleted.mp3");
         assertTrue(gone.createNewFile());
         Music phantom = LocalMusicLibrary.fromLocalFile(gone);
@@ -153,7 +155,8 @@ class LocalMusicLibraryTest {
         assertNotNull(music);
         File resolved = CloudMusicTestAccess.resolveLocalPseudoUrl(music);
         assertNotNull(resolved);
-        assertEquals(file.getAbsoluteFile(), resolved);
+        // 同上：身份是 canonical 小写路径，比较两端 canonical 形（同一文件即同一文件）。
+        assertEquals(file.getCanonicalFile(), resolved.getCanonicalFile());
 
         assertTrue(file.delete());
         assertNull(CloudMusicTestAccess.resolveLocalPseudoUrl(music),

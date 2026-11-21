@@ -108,6 +108,7 @@ class ZstdNativeDownloadStaticTest {
         String[][] scripts = {
                 {"1.20.1 recode", "fabric"}, {"1.20.1 recode", "forge"},
                 {"1.21.1", "fabric"}, {"1.21.1", "neoforge"},
+                {"1.21.8", "fabric"},
                 {"1.21.10", "fabric"}, {"1.21.10", "neoforge"},
                 {"1.21.11 recode", "fabric"}, {"1.21.11 recode", "neoforge"},
                 {"26.1.2", "fabric"}, {"26.1.2", "neoforge"},

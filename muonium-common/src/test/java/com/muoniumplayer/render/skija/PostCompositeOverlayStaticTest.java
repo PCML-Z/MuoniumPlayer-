@@ -52,7 +52,7 @@ class PostCompositeOverlayStaticTest {
 
     @Test
     void morphingPlayerRejectsTheEmptyTopmostPassBeforeOpeningAFrame() throws Exception {
-        for (String port : List.of("1.20.1 recode", "1.21.1", "1.21.10",
+        for (String port : List.of("1.20.1 recode", "1.21.1", "1.21.8", "1.21.10",
                 "1.21.11 recode", "26.1.2", "26.2", "26.3")) {
             Path client = ProjectPaths.repoRoot().resolve(port).resolve(Path.of("src", "main", "java",
                     "com", "muoniumplayer", "MuoniumPlayerClient.java"));
@@ -68,7 +68,7 @@ class PostCompositeOverlayStaticTest {
     }
 
     private static final List<String> DELAYED_PORTS = List.of(
-            "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3");
+            "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3");
 
     @Test
     void baseScreenIsCompositedThenSampledBeforeIslandOverlay() throws Exception {

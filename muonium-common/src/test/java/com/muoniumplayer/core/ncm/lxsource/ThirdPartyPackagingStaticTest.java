@@ -32,13 +32,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ThirdPartyPackagingStaticTest {
 
-    private static final Path LOADER_BUILD = ProjectPaths.loaderDir().resolve("build.gradle");
     private static final Path FABRIC_BUILD = ProjectPaths.fabric().resolve("build.gradle");
+
+    /** 第二加载器的构建脚本；单加载器树（如 1.21.8 仅 Fabric）不存在。 */
+    private static Path loaderBuild() {
+        return ProjectPaths.secondLoaderDir().orElse(ProjectPaths.fabric()).resolve("build.gradle");
+    }
 
     @Test
     @DisplayName("skija-shared / types 走 JarJar：loader 侧声明了 jarJar 坐标与版本区间")
     void skijaTypes走JarJar() throws IOException {
-        String build = read(LOADER_BUILD);
+        org.junit.jupiter.api.Assumptions.assumeTrue(ProjectPaths.secondLoaderDir().isPresent(),
+                "单加载器树没有第二加载器的 jarJar 嵌法，本断言不适用");
+        String build = read(loaderBuild());
         // 两条 jarJar 坐标必须在（写成单引号 Gradle 字符串字面量；SkijaNativeCatalogStaticTest
         // 钉的版本号字面量在 fabric 侧，这里的坐标断言只管「嵌的方式」）。
         assertTrue(build.contains("jarJar 'io.github.humbleui:skija-shared:"),
@@ -58,21 +64,26 @@ class ThirdPartyPackagingStaticTest {
     @Test
     @DisplayName("rhino 全链 relocate：十个构建都不许再引用原包名坐标")
     void rhino全链relocate() throws IOException {
-        String loader = read(LOADER_BUILD);
         String fabric = read(FABRIC_BUILD);
-        // relocate 任务存在且双包树都改（classfile 是 rhino 的字节码生成器，漏了就是新 split package）
-        assertTrue(loader.contains("relocate 'org.mozilla.javascript', 'muonium.rhino'")
-                        && fabric.contains("relocate 'org.mozilla.javascript', 'muonium.rhino'"),
-                "loader 与 fabric 两侧都必须有 rhino relocate 任务");
-        assertTrue(loader.contains("relocate 'org.mozilla.classfile', 'muonium.rhino.classfile'")
-                        && fabric.contains("relocate 'org.mozilla.classfile', 'muonium.rhino.classfile'"),
+        // 第二加载器侧（单加载器树没有，跳过该侧断言但 fabric 侧照查）
+        if (ProjectPaths.secondLoaderDir().isPresent()) {
+            String loader = read(loaderBuild());
+            // relocate 任务存在且双包树都改（classfile 是 rhino 的字节码生成器，漏了就是新 split package）
+            assertTrue(loader.contains("relocate 'org.mozilla.javascript', 'muonium.rhino'"),
+                    "loader 侧必须有 rhino relocate 任务");
+            assertTrue(loader.contains("relocate 'org.mozilla.classfile', 'muonium.rhino.classfile'"),
+                    "org.mozilla.classfile 也要 relocate：漏掉它就是新的 split package 隐患");
+            // 原 rhino 坐标不许再直接挂到任何配置上（embeddedLibs / include 都算）——
+            // 只允许出现在 relocateRhino 任务自己的 detachedConfiguration 里
+            assertFalse(loader.replaceAll("(?m)^\\s*//.*$", "")
+                            .replaceAll("(?s)/\\*.*?\\*/", "")
+                            .contains("embeddedLibs 'org.mozilla:rhino"),
+                    "loader 侧 embeddedLibs 不许直接引 rhino 坐标：必须走 relocateRhino 产物");
+        }
+        assertTrue(fabric.contains("relocate 'org.mozilla.javascript', 'muonium.rhino'"),
+                "fabric 侧必须有 rhino relocate 任务");
+        assertTrue(fabric.contains("relocate 'org.mozilla.classfile', 'muonium.rhino.classfile'"),
                 "org.mozilla.classfile 也要 relocate：漏掉它就是新的 split package 隐患");
-        // 原 rhino 坐标不许再直接挂到任何配置上（embeddedLibs / include 都算）——
-        // 只允许出现在 relocateRhino 任务自己的 detachedConfiguration 里
-        assertFalse(loader.replaceAll("(?m)^\\s*//.*$", "")
-                        .replaceAll("(?s)/\\*.*?\\*/", "")
-                        .contains("embeddedLibs 'org.mozilla:rhino"),
-                "loader 侧 embeddedLibs 不许直接引 rhino 坐标：必须走 relocateRhino 产物");
         assertFalse(fabric.replaceAll("(?m)^\\s*//.*$", "")
                         .replaceAll("(?s)/\\*.*?\\*/", "")
                         .contains("include('org.mozilla:rhino"),

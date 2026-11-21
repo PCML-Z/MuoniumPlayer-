@@ -50,6 +50,7 @@
 | `com/muoniumplayer/LoaderDependencyStaticTest.java` | ONLY | 1.21.11、26.2、26.3 | 只在该树存在（移植进度 / 版本独有断言） |
 | `com/muoniumplayer/MultiLoaderStaticTest.java` | ONLY | 1.20.1、1.21.11、26.2、26.3 | 只在该树存在（移植进度 / 版本独有断言） |
 | `com/muoniumplayer/Port1211StaticTest.java` | ONLY | 1.21.1 | 只在该树存在（移植进度 / 版本独有断言） |
+| `com/muoniumplayer/Port1218StaticTest.java` | ONLY | 1.21.8 | 只在该树存在（移植进度 / 版本独有断言） |
 | `com/muoniumplayer/compat/lwjgl2/Lwjgl2KeycodeProbeTest.java` | FORK | 五树都有 | keycode 探针按各版本真实表断言 |
 | `com/muoniumplayer/core/rendering/animation/AnimationSpeedStaticTest.java` | ONLY | 1.21.11、26.2、26.3 | 只在该树存在（移植进度 / 版本独有断言） |
 | `com/muoniumplayer/core/screens/hud/FoliaPanelRasterProbeTest.java` | ONLY | 1.21.11 | 只在该树存在（移植进度 / 版本独有断言） |

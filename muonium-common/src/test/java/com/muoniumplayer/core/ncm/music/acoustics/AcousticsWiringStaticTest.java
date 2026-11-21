@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * 五树接线防漂移:五棵版本树的 {@code MuoniumPlayerClient} 必须都调场景声学的
+ * 五树接线防漂移:八棵版本树的 {@code MuoniumPlayerClient} 必须都调场景声学的
  * tick 入口、都带 {@code ListenerProbe};共享引擎必须有尾槽。
  *
  * <p>测试从仓库布局反推五棵树的位置,任何一棵漏接线都会在这里点名。</p>
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AcousticsWiringStaticTest {
 
     private static final String[] TREES = {
-            "1.20.1 recode", "1.21.1", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3",
+            "1.20.1 recode", "1.21.1", "1.21.8", "1.21.10", "1.21.11 recode", "26.1.2", "26.2", "26.3",
     };
 
     private static Path repoRoot() {

@@ -58,6 +58,10 @@ class CineStaticTest {
     @Test
     void everyLoaderRegistersCameraFovRollAndActualInput() throws Exception {
         for (String loader : new String[]{"fabric", secondLoader()}) {
+            // 单加载器树（1.21.8 仅 Fabric）没有第二外壳，缺席侧不适用。
+            if (!loader.equals("fabric") && ProjectPaths.secondLoaderDir().isEmpty()) {
+                continue;
+            }
             String json = read(ProjectPaths.versionRoot().resolve(loader + "/src/main/resources/muonium.mixins.json"));
             for (String mixin : new String[]{"CineCameraMixin", "CineRollMixin", "CineFovMixin",
                     "CineKeyboardMixin", "CineMouseMixin", "CineHudMixin"}) {
