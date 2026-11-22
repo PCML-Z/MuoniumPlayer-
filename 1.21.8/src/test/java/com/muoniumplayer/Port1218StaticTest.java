@@ -149,14 +149,38 @@ class Port1218StaticTest {
         assertFalse(display.contains("window.handle()"),
                 "handle() 是 1.21.9 的改名，1.21.8 编不过");
 
-        // 实体渲染：1.21.8 仍是单段式 render(...)（extract/submit 两段式与
-        // SubmitNodeCollector 都不存在），Spin 头部混入要走 SpinHeadMixin。
+        // 实体渲染括号：1.21.8 的 dispatcher render 已按调用形拆四个重载，裸名
+        // render 会被 remapper 钉到转发形（零注入点，Scanned 0 target(s) 崩，实测）；
+        // 且名牌/绳下放进 renderer 的 super.render（基类只画绳+名牌），火焰/阴影/
+        // 碰撞箱仍在 dispatcher 侧读渲染态字段——透明/陀螺括号挂
+        // LivingEntityRenderer.render 的 HEAD…super.render，选择器全描述符钉死。
         String trans = stripComments(read(ProjectPaths.sourceFile(Paths.get(
                 "com", "muoniumplayer", "mixin", "TransparentEntityMixin.java"))));
-        assertTrue(trans.contains("method = \"render\""),
-                "1.21.8 的 EntityRenderDispatcher 仍是单段式 render(...) 入口");
+        assertTrue(trans.contains("LivingEntityRenderer.class"),
+                "1.21.8 的透明括号挂 LivingEntityRenderer（名牌在 super.render 里，dispatcher 锚不到）");
+        assertTrue(trans.contains("render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;"),
+                "方法选择器必须带 LivingEntityRenderState 擦除描述符（同名桥接 render(EntityRenderState,…) 只转发）");
+        assertTrue(trans.contains(
+                        "EntityRenderer;render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;"),
+                "end 锚点是 super.render（基类画牵引绳+名牌），必须全描述符钉死");
+        assertFalse(trans.contains("method = \"render\""),
+                "裸名 render 选择器在 1.21.8 有四个重载，会被钉到无注入点的转发重载");
+        assertFalse(trans.contains("displayFireAnimation"),
+                "displayFireAnimation 1.21.8 是渲染态字段读，Entity;displayFireAnimation()Z 调用点不存在");
         assertFalse(trans.contains("SubmitNodeCollector") || trans.contains("extractEntity"),
                 "1.21.8 没有 SubmitNodeCollector / extractEntity（1.21.9+ 的两段式）");
+        String spinEntity = stripComments(read(ProjectPaths.sourceFile(Paths.get(
+                "com", "muoniumplayer", "mixin", "SpinEntityMixin.java"))));
+        assertTrue(spinEntity.contains("LivingEntityRenderer.class")
+                        && spinEntity.contains("render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;"),
+                "陀螺括号与透明括号同坑位（LivingEntityRenderer.render HEAD…super.render）");
+        assertTrue(spinEntity.contains(
+                        "EntityRenderer;render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;"),
+                "SpinEntityMixin 的 end 锚点同为 super.render 全描述符");
+        assertFalse(spinEntity.contains("method = \"render\"") || spinEntity.contains("displayFireAnimation"),
+                "SpinEntityMixin 不得回到裸名 render / 旧 fire 锚点");
+        assertTrue(spinEntity.contains("PlayerRenderState"),
+                "实体身份从渲染态取（PlayerRenderState.id 对比本地玩家 id，SpinHeadMixin 同模式）");
         assertTrue(Files.exists(ProjectPaths.sourceFile(Paths.get(
                         "com", "muoniumplayer", "mixin", "SpinHeadMixin.java"))),
                 "SpinHeadMixin 是单段式世代的头部混入（extract 代际才并进 SpinEntityMixin）");
